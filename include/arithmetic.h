@@ -111,19 +111,19 @@ public:
     void ParseToPolish() {
         expr.erase(remove_if(expr.begin(), expr.end(), isspace), expr.end());
         ExamOnInCorrect();
-        
+
 
 
         //std::stringstream temp;
-        int count = 0;
-        std::stringstream is(expr);
-        char ch; char prev; std::string x; std::string t;
+        std::string x; std::string t;
         TStack <std::string> PolishStack, OperationStack;
-        ch = '+';
+        char ch = '+';
+        int pos = 0;
         do {
 
-            prev = ch;
-            ch = is.peek();
+
+            ch = expr[pos];
+            //pos += 1;
             x = std::string(1, ch);
 
 
@@ -134,8 +134,8 @@ public:
                 do {
 
                     t += ch;
-                    is.ignore();
-                    ch = is.peek();
+                    pos += 1;
+                    ch = expr[pos];
                 } while (IsSymbol(ch));
 
                 PolishStack.push(t);
@@ -148,8 +148,8 @@ public:
                 do {
 
                     t += ch;
-                    is.ignore();
-                    ch = is.peek();
+                    pos += 1;
+                    ch = expr[pos];
                     if (ch == '.') count += 1;
                 } while (('0' <= ch && ch <= '9') || ch == '.');
 
@@ -162,20 +162,12 @@ public:
 
 
 
-            /*if ('0' <= ch && ch <= '9') {
-                float sh;
-                is >> sh;
-                PolishStack.push(std::to_string(sh));
-            }*/
-
-
-
             else if (x == "(") {
-                OperationStack.push(x); is.ignore();
+                OperationStack.push(x); pos += 1;
             }
             else if (x == ")") {
-                /*if (IsOperation(prev)) throw std::invalid_argument("operator_before_closing_bracket");*/
-                is.ignore();
+
+                pos += 1;
                 while (1) {
                     std::string t = OperationStack.top();
                     OperationStack.pop();
@@ -183,15 +175,15 @@ public:
                     PolishStack.push(t);
                 }
             }
-            /*else if (ch == '-' && IsOperation(prev)) {
-                is.ignore();
+            else if ((ch == '-' && IsOperation(expr[pos - 1])) || (ch == '-' && expr[pos - 1] == '(') || (pos == 0 && ch == '-')) {
+                pos += 1;
                 ch = '@';
                 x = "@";
 
 
                 while (!OperationStack.empty()) {
                     std::string t = OperationStack.top();
-                    if (GetOperationPrt(x) <= GetOperationPrt(t)) {
+                    if (GetOperationPrt(x) < GetOperationPrt(t)) {
                         OperationStack.pop();
                         PolishStack.push(t);
                     }
@@ -203,13 +195,13 @@ public:
                 OperationStack.push(x);
 
 
-            }*/
+            }
             else if (IsOperation(ch)) {
 
-                
 
 
-                is.ignore();
+
+                pos += 1;
                 while (!OperationStack.empty()) {
                     std::string t = OperationStack.top();
                     if (GetOperationPrt(x) <= GetOperationPrt(t)) {
@@ -252,7 +244,6 @@ public:
 
 
     }
-
 
 
 
