@@ -12,7 +12,7 @@ int main()
 		std::string input = "";
 
 
-		std::cout << "input expression. expression must end on'=':\n";
+		std::cout << "input expression. input '.', not ','. expression must end on'=':\n";
 
 		std::cin.clear();
 		std::cin.clear();
