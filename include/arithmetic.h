@@ -69,7 +69,8 @@ public:
                     std::cout << "binar_operation_cannot_be_first_symbol_of_equation";
                     throw std::invalid_argument("binar_operation_cannot_be_first_symbol_of_equation");
                 }
-                else if (expr[i] == ')') { std::cout << "closed_bracket_cannot_start_the_expression "; throw std::invalid_argument("open_bracket_cannot_start_the_expression "); }
+                else if (expr[i] == ')') { std::cout << "closed_bracket_cannot_start_the_expression "; throw std::invalid_argument("close_bracket_cannot_start_the_expression "); }
+                else if (expr[i] == '.') { std::cout << "dot_cannot_start_the_expression"; throw std::invalid_argument("dot_cannot_start_the_expression "); }
                 else if (expr[i] == '(' && IsOperation(expr[i + 1]) && expr[i + 1] != '-') {
                     std::cout << "binar_operator_after_opening_bracket";
                     throw std::invalid_argument("binar_operator_after_opening_bracket");
@@ -103,6 +104,11 @@ public:
                     std::cout << "unknown symbol";
                     throw std::invalid_argument("unknown_symbol");
                 }
+                else if (expr[i] != ')' && expr[i] != '(' && !IsSymbol(expr[i]) && !IsAlpha(expr[i]) && !IsOperation(expr[i]) && expr[i] != '.') {
+                    std::cout << "unknown symbol";
+                    throw std::invalid_argument("unknown_symbol");
+                }
+                else if ((expr[i] == '.' && !IsAlpha(expr[i-1]) && !IsAlpha(expr[i + 1])) || (expr[i] == '.' && IsAlpha(expr[i - 1]) && !IsAlpha(expr[i + 1])) || (expr[i] == '.' && !IsAlpha(expr[i - 1]) && IsAlpha(expr[i + 1]))) { std::cout << "dot_without_numbers"; throw std::invalid_argument("dot_without_numbers"); }
             }
         }
     }
@@ -175,7 +181,7 @@ public:
                     PolishStack.push(t);
                 }
             }
-            else if ((ch == '-' && IsOperation(expr[pos - 1])) || (ch == '-' && expr[pos - 1] == '(') || (pos == 0 && ch == '-')) {
+            else if ((pos == 0 && ch == '-') || (ch == '-' && IsOperation(expr[pos - 1])) || (ch == '-' && expr[pos - 1] == '(')) {
                 pos += 1;
                 ch = '@';
                 x = "@";

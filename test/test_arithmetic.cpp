@@ -20,6 +20,24 @@ TEST(Parser, binar_operator_first)
 
 
 
+TEST(Parser, dot_cannot_start_the_expression)
+{
+
+	std::string a = ".5+50=";
+	Parser h(a);
+	ASSERT_ANY_THROW(h.ParseToPolish());
+}
+
+
+TEST(Parser, dot_without_numbers)
+{
+
+	std::string a = "5+50.=";
+	Parser h(a);
+	ASSERT_ANY_THROW(h.ParseToPolish());
+}
+
+
 
 TEST(Parser, unar_minus_operator_first)
 {
@@ -33,9 +51,9 @@ TEST(Parser, unar_minus_operator_first)
 TEST(Parser, alpha_before_open_bracket)
 {
 
-	std::string a = "-25(50+6)=";
-	Parser h(a);
-	ASSERT_ANY_THROW(h.ParseToPolish());
+	//std::string a = "-25(50+6)=";
+	//Parser h(a);
+	//ASSERT_ANY_THROW(h.ParseToPolish());
 }
 
 TEST(Parser, symbol_before_open_bracket)
