@@ -13,16 +13,86 @@ private:
     TStack<std::string> PolishStack;
 
     bool IsContainVariables = false;
-public:
 
 
-    Parser(std::string Expr) : expr(Expr) {
+    void ExamOnInCorrect() {
+
+        int count = 0;
+        for (int i = 0; i < expr.size(); i++) {
+            if (expr[i] == '(') count++;
+            if (expr[i] == ')') count--;
+        }
+        if (count != 0)
+            throw std::invalid_argument("num_of_closing_and_opening_brackets_not_equal");
+
+        for (int i = 0; i < expr.size(); i++)
+        {
+            if (i == 0) {
+                if (IsOperation(expr[i]) && expr[i] != '=' && expr[i] != '-') {
+                    std::cout << "binar_operation_cannot_be_first_symbol_of_equation";
+                    throw std::invalid_argument("binar_operation_cannot_be_first_symbol_of_equation");
+                }
+                else if (expr[i] == ')') { std::cout << "closed_bracket_cannot_start_the_expression "; throw std::invalid_argument("close_bracket_cannot_start_the_expression "); }
+                else if (expr[i] == '.') { std::cout << "dot_cannot_start_the_expression"; throw std::invalid_argument("dot_cannot_start_the_expression "); }
+                else if (expr[i] == '(' && IsOperation(expr[i + 1]) && expr[i + 1] != '-') {
+                    std::cout << "binar_operator_after_opening_bracket";
+                    throw std::invalid_argument("binar_operator_after_opening_bracket");
+                }
+            }
+            else {
+                if (IsOperation(expr[i - 1]) && IsOperation(expr[i]) && expr[i] != '-') {
+                    std::cout << "two binar operations cannot be one after another";
+                    throw std::invalid_argument("two binar operations cannot be one after another");
+                }
+                else if (expr[i] == ')' && IsOperation(expr[i - 1])) {
+
+                    std::cout << "operator_before_closing_bracket";
+
+                    throw std::invalid_argument("operator_before_closing_bracket");
+
+                }
+                else if (expr[i] == ')' && (IsAlpha(expr[i + 1]) || IsSymbol(expr[i + 1]))) {
+                    std::cout << "symbol_or_alpha_after_closing_bracket";
+                    throw std::invalid_argument("symbol_or_alpha_after_closing_bracket");
+                }
+                else if (expr[i] == '(' && IsOperation(expr[i + 1]) && expr[i + 1] != '-') {
+                    std::cout << "binar_operator_after_opening_bracket";
+                    throw std::invalid_argument("binar_operator_after_opening_bracket");
+                }
+                else if (expr[i] == '(' && (IsAlpha(expr[i - 1]) || IsSymbol(expr[i - 1]))) {
+                    std::cout << "symbol_or_alpha_before_opening_bracket";
+                    throw std::invalid_argument("symbol_or_alpha_before_opening_bracket");
+                }
+                else if (expr[i] != ')' && expr[i] != '(' && !IsSymbol(expr[i]) && !IsAlpha(expr[i]) && !IsOperation(expr[i]) && expr[i] != '.') {
+                    std::cout << "unknown symbol";
+                    throw std::invalid_argument("unknown_symbol");
+                }
+                else if (expr[i] != ')' && expr[i] != '(' && !IsSymbol(expr[i]) && !IsAlpha(expr[i]) && !IsOperation(expr[i]) && expr[i] != '.') {
+                    std::cout << "unknown symbol";
+                    throw std::invalid_argument("unknown_symbol");
+                }
+                else if ((expr[i] == '.' && !IsAlpha(expr[i - 1]) && !IsAlpha(expr[i + 1])) || (expr[i] == '.' && IsAlpha(expr[i - 1]) && !IsAlpha(expr[i + 1])) || (expr[i] == '.' && !IsAlpha(expr[i - 1]) && IsAlpha(expr[i + 1]))) { std::cout << "dot_without_numbers"; throw std::invalid_argument("dot_without_numbers"); }
+            }
+        }
+
+
+        if (expr[expr.size() - 1] != '=') {
+            std::cout << "equal_not_last_symbol_of_equation";
+            throw std::invalid_argument("equal_not_last_symbol_of_equation");
+        }
 
     }
 
-    bool GetIsContainVariables() {
-        return IsContainVariables;
+
+    void ExamOnContainVariables() {
+        for (int i = 0; i < expr.size(); i++) {
+            if (IsSymbol(expr[i])) {
+                IsContainVariables = true;
+                break;
+            }
+        }
     }
+
 
     int GetOperationPrt(std::string op) {
         int Prt;
@@ -66,85 +136,39 @@ public:
 
 
 
+    float doOperation(float a, float b, char op) {
+        float result;
 
-
-    void ExamOnInCorrect() {
-
-        int count = 0;
-        for(int i = 0; i < expr.size(); i++) {
-            if (expr[i] == '(') count++;
-            if (expr[i] == ')') count--;
-        }
-        if(count!=0)
-            throw std::invalid_argument("num_of_closing_and_opening_brackets_not_equal");
-
-        for (int i = 0; i < expr.size(); i++)
-        {
-            if (i == 0) {
-                if (IsOperation(expr[i]) && expr[i] != '=' && expr[i] != '-') {
-                    std::cout << "binar_operation_cannot_be_first_symbol_of_equation";
-                    throw std::invalid_argument("binar_operation_cannot_be_first_symbol_of_equation");
-                }
-                else if (expr[i] == ')') { std::cout << "closed_bracket_cannot_start_the_expression "; throw std::invalid_argument("close_bracket_cannot_start_the_expression "); }
-                else if (expr[i] == '.') { std::cout << "dot_cannot_start_the_expression"; throw std::invalid_argument("dot_cannot_start_the_expression "); }
-                else if (expr[i] == '(' && IsOperation(expr[i + 1]) && expr[i + 1] != '-') {
-                    std::cout << "binar_operator_after_opening_bracket";
-                    throw std::invalid_argument("binar_operator_after_opening_bracket");
-                }
-            }
-            else {
-                if (IsOperation(expr[i - 1]) && IsOperation(expr[i]) && expr[i] != '-') {
-                    std::cout << "two binar operations cannot be one after another";
-                    throw std::invalid_argument("two binar operations cannot be one after another");
-                }
-                else if (expr[i] == ')' && IsOperation(expr[i - 1])) {
-
-                    std::cout << "operator_before_closing_bracket";
-
-                    throw std::invalid_argument("operator_before_closing_bracket");
-
-                }
-                else if (expr[i] == ')' && (IsAlpha(expr[i + 1]) || IsSymbol(expr[i + 1]))) {
-                    std::cout << "symbol_or_alpha_after_closing_bracket";
-                    throw std::invalid_argument("symbol_or_alpha_after_closing_bracket");
-                }
-                else if (expr[i] == '(' && IsOperation(expr[i + 1]) && expr[i + 1] != '-') {
-                    std::cout << "binar_operator_after_opening_bracket";
-                    throw std::invalid_argument("binar_operator_after_opening_bracket");
-                }
-                else if (expr[i] == '(' && (IsAlpha(expr[i - 1]) || IsSymbol(expr[i - 1]))) {
-                    std::cout << "symbol_or_alpha_before_opening_bracket";
-                    throw std::invalid_argument("symbol_or_alpha_before_opening_bracket");
-                }
-                else if (expr[i]!=')' && expr[i]!='(' && !IsSymbol(expr[i]) && !IsAlpha(expr[i]) && !IsOperation(expr[i]) && expr[i]!='.') {
-                    std::cout << "unknown symbol";
-                    throw std::invalid_argument("unknown_symbol");
-                }
-                else if (expr[i] != ')' && expr[i] != '(' && !IsSymbol(expr[i]) && !IsAlpha(expr[i]) && !IsOperation(expr[i]) && expr[i] != '.') {
-                    std::cout << "unknown symbol";
-                    throw std::invalid_argument("unknown_symbol");
-                }
-                else if ((expr[i] == '.' && !IsAlpha(expr[i-1]) && !IsAlpha(expr[i + 1])) || (expr[i] == '.' && IsAlpha(expr[i - 1]) && !IsAlpha(expr[i + 1])) || (expr[i] == '.' && !IsAlpha(expr[i - 1]) && IsAlpha(expr[i + 1]))) { std::cout << "dot_without_numbers"; throw std::invalid_argument("dot_without_numbers"); }
-            }
+        switch (op) {
+        case '*': result = a * b; break;
+        case '/': result = a / b; break;
+        case '+': result = a + b; break;
+        case '-': result = a - b; break;
+        default: result = -1; break;
         }
 
-
-        if (expr[expr.size()-1] != '='){
-            std::cout << "equal_not_last_symbol_of_equation";
-            throw std::invalid_argument("equal_not_last_symbol_of_equation");
-        }
+        return result;
 
     }
 
 
-    void ExamOnContainVariables() {
-        for (int i = 0; i < expr.size(); i++) {
-            if (IsSymbol(expr[i])) {
-                IsContainVariables = true;
-                break;
-            }
-        }
+
+public:
+
+
+    Parser(std::string Expr) : expr(Expr) {
+
     }
+
+    bool GetIsContainVariables() {
+        return IsContainVariables;
+    }
+
+    
+
+
+
+    
 
 
     void ParseToPolish() {
@@ -158,13 +182,8 @@ public:
         char ch = '+';
         int pos = 0;
         do {
-
-
             ch = expr[pos];
             x = std::string(1, ch);
-
-
-
 
             if (('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z')) {
                 std::string t = "";
@@ -196,8 +215,6 @@ public:
 
 
             }
-
-
 
             else if (x == "(") {
                 OperationStack.push(x); pos += 1;
@@ -250,8 +267,6 @@ public:
             else { throw std::invalid_argument("user_input_unknown_symbol"); }
         } while (x != "=");
 
-
-
     }
 
 
@@ -286,20 +301,7 @@ public:
 
 
 
-    float doOperation(float a, float b, char op) {
-        float result;
 
-        switch (op) {
-        case '*': result = a * b; break;
-        case '/': result = a / b; break;
-        case '+': result = a + b; break;
-        case '-': result = a - b; break;
-        default: result = -1; break;
-        }
-
-        return result;
-
-    }
 
 
     float CountPolish() {
