@@ -10,11 +10,18 @@ class Parser
 private:
     std::string expr;
     TStack<std::string> resultParse;
+    TStack<std::string> PolishStack;
+
+    bool IsContainVariables = false;
 public:
 
 
     Parser(std::string Expr) : expr(Expr) {
 
+    }
+
+    bool GetIsContainVariables() {
+        return IsContainVariables;
     }
 
     int GetOperationPrt(std::string op) {
@@ -62,6 +69,15 @@ public:
 
 
     void ExamOnInCorrect() {
+
+        int count = 0;
+        for(int i = 0; i < expr.size(); i++) {
+            if (expr[i] == '(') count++;
+            if (expr[i] == ')') count--;
+        }
+        if(count!=0)
+            throw std::invalid_argument("num_of_closing_and_opening_brackets_not_equal");
+
         for (int i = 0; i < expr.size(); i++)
         {
             if (i == 0) {
@@ -111,25 +127,40 @@ public:
                 else if ((expr[i] == '.' && !IsAlpha(expr[i-1]) && !IsAlpha(expr[i + 1])) || (expr[i] == '.' && IsAlpha(expr[i - 1]) && !IsAlpha(expr[i + 1])) || (expr[i] == '.' && !IsAlpha(expr[i - 1]) && IsAlpha(expr[i + 1]))) { std::cout << "dot_without_numbers"; throw std::invalid_argument("dot_without_numbers"); }
             }
         }
+
+
+        if (expr[expr.size()-1] != '='){
+            std::cout << "equal_not_last_symbol_of_equation";
+            throw std::invalid_argument("equal_not_last_symbol_of_equation");
+        }
+
+    }
+
+
+    void ExamOnContainVariables() {
+        for (int i = 0; i < expr.size(); i++) {
+            if (IsSymbol(expr[i])) {
+                IsContainVariables = true;
+                break;
+            }
+        }
     }
 
 
     void ParseToPolish() {
         expr.erase(remove_if(expr.begin(), expr.end(), isspace), expr.end());
         ExamOnInCorrect();
+        ExamOnContainVariables();
 
 
-
-        //std::stringstream temp;
         std::string x; std::string t;
-        TStack <std::string> PolishStack, OperationStack;
+        TStack <std::string> OperationStack;
         char ch = '+';
         int pos = 0;
         do {
 
 
             ch = expr[pos];
-            //pos += 1;
             x = std::string(1, ch);
 
 
@@ -199,13 +230,8 @@ public:
                 }
 
                 OperationStack.push(x);
-
-
             }
             else if (IsOperation(ch)) {
-
-
-
 
                 pos += 1;
                 while (!OperationStack.empty()) {
@@ -221,33 +247,36 @@ public:
 
                 OperationStack.push(x);
             }
-            else { throw std::invalid_argument("user input unknown symbol"); }
+            else { throw std::invalid_argument("user_input_unknown_symbol"); }
         } while (x != "=");
 
 
-        while (!PolishStack.empty()) {
-            std::string lem = PolishStack.top();
+
+    }
+
+
+    void inputVariables() {
+
+        TStack <std::string> temp_stack(PolishStack);
+
+        while (!temp_stack.empty()) {
+            std::string lem = temp_stack.top();
             if (IsSymbol(lem[0])) {
                 std::cout << "input " << lem << ":";
                 std::cin >> lem;
+
+
+                for (int i = 0; i < lem.size(); i++) {
+                    if (!(IsAlpha(lem[i]) || lem[i] == '.' || lem[i] == '-')) {
+                        std::cout << "incorrect_input_of_variables";
+                        throw std::invalid_argument("incorrect_input_of_variables");
+                    }
+                }
             }
             resultParse.push(lem);
 
-            PolishStack.pop();
+            temp_stack.pop();
         }
-
-
-
-        /*std::string result = "";
-        while (!resultParse.empty()) {
-            result += resultParse.top();
-            result += " ";
-            resultParse.pop();
-        }
-
-        std::cout << result;*/
-
-
 
     }
 
@@ -274,22 +303,13 @@ public:
 
 
     float CountPolish() {
-        /*std::string result = "";
-        while (!resultParse.empty()) {
-            result += resultParse.top();
-            result += " ";
-            resultParse.pop();
-        }*/
-
-        //std::cout << result;
-
-        float t=0;
         TStack<std::string> count;
+
 
         while (!resultParse.empty()) {
             std::string temp = resultParse.top();
             resultParse.pop();
-            if ('0' <= temp[0] && temp[0] <= '9')
+            if (('0' <= temp[0] && temp[0] <= '9') || (temp[0] == '-' && temp.size() > 1))
             {
                 count.push(temp);
             }
@@ -309,17 +329,9 @@ public:
             }
         }
 
-        
-        
-        //std::cout << "\n\n     " << count.top() << " ";
+
         return std::stof(count.top());
     }
-
-
-
-
-
-
 
 
 

@@ -9,7 +9,7 @@
 // при вставке в полный стек должна перевыделяться память
 
 #pragma once
-
+#include<iostream>
 
 template <class TElement>
 struct Node {
@@ -93,5 +93,20 @@ public:
 	bool empty() {
 		return sizeOfStack == 0;
 	}
+
+
+	friend std::ostream& operator<<(std::ostream& ostr, const TStack& s) // вывод
+	{
+
+		Node<TElement>* t = s.currentTop;
+
+		while (t != 0) {
+			ostr << t->data << " ";
+			t = t->next;
+		}
+
+		return ostr;
+	}
+
 
 };

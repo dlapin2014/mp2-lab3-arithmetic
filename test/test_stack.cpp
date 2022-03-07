@@ -100,6 +100,19 @@ TEST(TStack, pop_empty_array_throws_exception)
 }
 
 
+TEST(TStack, cout_stack)
+{
+	TStack<int> a;
+	a.push(2);
+	a.push(3);
+	a.push(6);
+	std::stringstream in;
+	in << a;
+	std::string temp = in.str();
+	EXPECT_EQ(temp, "6 3 2 ");
+}
+
+
 
 
 
